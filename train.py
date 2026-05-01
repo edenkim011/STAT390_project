@@ -17,7 +17,7 @@ def run_baseline():
     train_df = pd.read_csv('data/working_train.csv')
 
     #select simple features for baseline
-    features = ['Age', 'Fee']
+    features = ['Age', 'Fee', 'Type', 'Gender']
     target = 'AdoptionSpeed'
 
     #select from data 
