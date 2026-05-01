@@ -14,7 +14,7 @@ Run `python prepare.py` to generate deterministic 80/20 split and lock the test 
 Run `python train.py` to see the baseline RMSE and runtime. 
 
 
-### Current baseline results
+### Current Best results
 - Validation metric: RMSE
-- Baseline score: 1.1706
-- Measured runtime: 0.0502 seconds
+- Best score: 1.165
+- Measured runtime: 0.0825 seconds

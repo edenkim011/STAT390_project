@@ -18,3 +18,19 @@ Objective: Build a reproducible research instrument and frozen evaluation pipeli
 
 ### Status: 
 - Future iterations will focus on feature engineering to beat the 1.1706 baseline. 
+
+## May 1, 2026
+Experiment ID: Exp_02
+Objective: Add 'Type' and 'Gender' to features list.
+
+### Actions:
+- Modified `train.py` to include 'Type' and 'Gender' in the features list.
+- Ran `python train.py` to evaluate performance.
+
+### Metrics:
+- Validation metric: RMSE
+- Score: 1.165
+- Measured runtime: 0.0825 seconds
+
+### Status: 
+- Success: Improved RMSE from 1.1706 to 1.165. Changes committed.

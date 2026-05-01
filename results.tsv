@@ -1,2 +1,3 @@
 Date    Experiment_ID   Metric_RMSE Runtime Notes
 04-22-2026  Baseline_01 1.1706  0.0502  Linear Regression on Age/Fee, test set locked
+05-01-2026  Exp_02  1.165   0.0825  Added Type and Gender features
