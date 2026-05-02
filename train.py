@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import time #measure runtime 
 from sklearn.ensemble import RandomForestRegressor # create baseline model
+from sklearn.preprocessing import StandardScaler
 from prepare import evaluate_model # model evaluator taken from prepare.py
 
 
@@ -21,9 +22,12 @@ def run_baseline():
     target = 'AdoptionSpeed'
 
     #select from data 
-    X = train_df[features]
+    X = train_df[features].copy()
     y = train_df[target]
 
+    # Scale numerical features
+    scaler = StandardScaler()
+    X[['Age', 'Fee']] = scaler.fit_transform(X[['Age', 'Fee']])
 
     #train baseline model 
     model = RandomForestRegressor(random_state=42)
