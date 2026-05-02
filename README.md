@@ -16,5 +16,5 @@ Run `python train.py` to see the baseline RMSE and runtime.
 
 ### Current Best results
 - Validation metric: RMSE
-- Best score: 1.165
-- Measured runtime: 0.0825 seconds
+- Best score: 1.0726
+- Measured runtime: 0.492 seconds

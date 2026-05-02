@@ -34,3 +34,19 @@ Objective: Add 'Type' and 'Gender' to features list.
 
 ### Status: 
 - Success: Improved RMSE from 1.1706 to 1.165. Changes committed.
+
+## May 1, 2026
+Experiment ID: Exp_03
+Objective: Use RandomForestRegressor instead of LinearRegression.
+
+### Actions:
+- Modified `train.py` to use `RandomForestRegressor`.
+- Ran `python train.py` to evaluate performance.
+
+### Metrics:
+- Validation metric: RMSE
+- Score: 1.0726
+- Measured runtime: 0.492 seconds
+
+### Status: 
+- Success: Improved RMSE from 1.165 to 1.0726. Changes committed.
