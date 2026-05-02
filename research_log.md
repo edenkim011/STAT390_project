@@ -50,3 +50,19 @@ Objective: Use RandomForestRegressor instead of LinearRegression.
 
 ### Status: 
 - Success: Improved RMSE from 1.165 to 1.0726. Changes committed.
+
+## May 1, 2026
+Experiment ID: Exp_04
+Objective: Scale numerical features 'Age' and 'Fee' using StandardScaler.
+
+### Actions:
+- Modified `train.py` to implement `StandardScaler` for 'Age' and 'Fee'.
+- Ran `python train.py` to evaluate performance.
+
+### Metrics:
+- Validation metric: RMSE
+- Score: 1.0727
+- Measured runtime: 0.465 seconds
+
+### Status: 
+- Failure: RMSE increased from 1.0726 to 1.0727. Changes reverted.
