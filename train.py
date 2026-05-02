@@ -3,7 +3,7 @@
 import pandas as pd
 import numpy as np
 import time #measure runtime 
-from sklearn.linear_model import LinearRegression # create baseline model
+from sklearn.ensemble import RandomForestRegressor # create baseline model
 from prepare import evaluate_model # model evaluator taken from prepare.py
 
 
@@ -26,7 +26,7 @@ def run_baseline():
 
 
     #train baseline model 
-    model = LinearRegression()
+    model = RandomForestRegressor(random_state=42)
     model.fit(X, y)
 
     #generate predictions
