@@ -1,4 +1,4 @@
-#baseline script: willl run first linear regression
+#baseline script: will run RandomForestRegressor
 
 import pandas as pd
 import numpy as np
