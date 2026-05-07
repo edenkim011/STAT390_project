@@ -66,3 +66,8 @@ Objective: Scale numerical features 'Age' and 'Fee' using StandardScaler.
 
 ### Status: 
 - Failure: RMSE increased from 1.0726 to 1.0727. Changes reverted.
+
+## May 6, 2026 - Week 4
+| Experiment ID | Type | RMSE | Runtime |
+| :--- | :--- | :--- | :--- |
+| Exp_4.0 | Baseline | 1.0727 | 0.4874s |
