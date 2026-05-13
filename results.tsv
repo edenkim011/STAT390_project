@@ -1,5 +1,24 @@
-Date    Experiment_ID   Metric_RMSE Runtime Notes
-04-22-2026  Baseline_01 1.1706  0.0502  Linear Regression on Age/Fee, test set locked
-05-01-2026  Exp_02  1.165   0.0825  Added Type and Gender features
-05-01-2026  Exp_03  1.0726  0.492   Replaced LinearRegression with RandomForestRegressor
-05-01-2026  Exp_04  1.0727  0.465   Added StandardScaler for Age and Fee (failed to improve)
+Date	Experiment_ID	Metric_RMSE	Runtime	Variable_Changed	Decision
+04-22-2026	Baseline_01	1.1706	0.0502	RandomForestRegression on Age/Fee/Type/Gender	KEEP
+05-12-2026	Exp_01	0.9728	0.9087	Added Health, Vaccinated, Dewormed, Sterilized	KEEP
+05-12-2026	Exp_02	0.6357	2.0195	Added PhotoAmt, Quantity, MaturitySize, FurLength	KEEP
+05-12-2026	Exp_03	0.5112	2.3661	Added Breed1, Color1	KEEP
+05-12-2026	Exp_04	1.1386	0.0921	LinearRegression (features fixed)	DISCARD
+05-12-2026	Exp_05	1.1386	0.0915	Ridge alpha=1.0 (features fixed)	DISCARD
+05-12-2026	Exp_06	1.0571	0.7071	GradientBoostingRegressor (features fixed)	DISCARD
+05-12-2026	Exp_07	0.3407	1.9726	ExtraTreesRegressor (features fixed)	KEEP
+05-12-2026	Exp_08	0.3407	1.3230	n_estimators=200, n_jobs=-1	DISCARD
+05-12-2026	Exp_09	0.3407	1.9252	n_estimators=300, n_jobs=-1	DISCARD
+05-12-2026	Exp_10	0.5756	0.5825	min_samples_leaf=2 (n=100, depth=None)	DISCARD
+05-12-2026	Exp_11	0.5515	0.4987	max_depth=20 (n=100, leaf=1)	DISCARD
+05-12-2026	Exp_12	0.3453	0.5656	max_depth=30 (n=100, leaf=1)	DISCARD
+05-12-2026	Exp_13	0.0914	5.3159	Added doc_score, doc_magnitude from sentiment JSONs	KEEP
+05-12-2026	Exp_14	0.0789	5.2511	Added sent_count, sent_score_mean, sent_mag_mean	KEEP
+05-12-2026	Exp_15	0.0786	5.7821	Added sent_score_std, sent_score_max, sent_score_min, sent_mag_max	KEEP
+05-12-2026	Exp_16	0.0577	6.3923	Added entity_count, top_salience	KEEP
+05-12-2026	Exp_17	0.0577	6.4991	Added sent_density=doc_magnitude/(sent_count+1)	DISCARD
+05-13-2026	Exp_18	0.0000	17.2240	Added color features (mean-agg): top_color_score, top_color_pixel_frac, color_count, top3_pixel_frac_sum	KEEP
+05-13-2026	Exp_19	0.0000	19.1197	Added crop_confidence, crop_importance (mean-agg)	KEEP
+05-13-2026	Exp_20	0.0000	16.8328	Added top_label_score, label_count, label_score_mean (mean-agg)	KEEP
+05-13-2026	Exp_21	0.0000	16.0208	Switched aggregation from mean to max (best-photo strategy)	KEEP
+05-13-2026	Exp_22	0.0000	11.9471	First-photo-only aggregation (primary listing photo)	KEEP
