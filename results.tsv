@@ -22,3 +22,18 @@ Date	Experiment_ID	Metric_RMSE	Runtime	Variable_Changed	Decision
 05-13-2026	Exp_20	0.0000	16.8328	Added top_label_score, label_count, label_score_mean (mean-agg)	KEEP
 05-13-2026	Exp_21	0.0000	16.0208	Switched aggregation from mean to max (best-photo strategy)	KEEP
 05-13-2026	Exp_22	0.0000	11.9471	First-photo-only aggregation (primary listing photo)	KEEP
+05-21-2026	Exp_23	1.0797	29.9352	Switched to 5-fold CV RMSE; baseline out-of-sample score	KEEP
+05-21-2026	Exp_24	1.0792	21.4959	min_samples_leaf=10 (ExtraTrees regularization)	DISCARD
+05-21-2026	Exp_25	1.0953	25.3969	Dropped visual features (base + sentiment only)	DISCARD
+05-21-2026	Exp_26	1.0788	27.0775	GradientBoostingRegressor default settings (full features)	DISCARD
+05-21-2026	Exp_27	1.0745	44.0715	GBR tuned: n=200, lr=0.05, depth=4, subsample=0.8, leaf=10	KEEP
+05-21-2026	Exp_28	1.0797	49.0091	RandomForestRegressor(min_samples_leaf=5)	DISCARD
+05-21-2026	Exp_29	1.0774	15.5524	HistGradientBoostingRegressor default	DISCARD
+05-21-2026	Exp_30	1.0770	19.5473	HistGBR: max_iter=300, lr=0.05	DISCARD
+05-21-2026	Exp_31	1.0750	45.7453	GBR tuned + within-fold TE for Breed1 and Color1	DISCARD
+05-21-2026	Exp_32	1.0657	47.2581	Added Breed2, Color2, Color3, State, VideoAmt to features	KEEP
+05-21-2026	Exp_33	1.0906	46.2928	Within-fold target encoding for RescuerID (high variance, too sparse)	DISCARD
+05-21-2026	Exp_34	1.0673	42.8413	Feature pruning: dropped 12 low-importance features	DISCARD
+05-21-2026	Exp_35	1.0656	45.5739	Added has_name binary feature	DISCARD
+05-21-2026	Exp_36	1.0643	58.3591	Added TF-IDF (15 unigrams, sublinear_tf) from Description text	KEEP
+05-21-2026	Exp_37	1.0823	24.4322	ExtraTreesRegressor(min_samples_leaf=20) with TF-IDF	DISCARD

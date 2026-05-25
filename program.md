@@ -1,56 +1,19 @@
-# AutoResearch Agent instructions
+# AutoResearch agent instructions: Week 6 scope lock
 
-## Objective: 
-Minimize Root Mean Squared Error (RMSE) on the `AdoptionSpeed` target using the PetFinder dataset. The primary research goal is to determine if linguistic sentiment from pet biographies reduces prediction error compared to a baseline of physical traits.
+## Objective
+Establish the definitive empirical boundary for linguistic and visual metadata signals on the PetFinder dataset. Optimize Root Mean Squared Error (RMSE) on the `AdoptionSpeed` target exclusively using our frozen data setup.
 
-## Rules: 
-1. You may ONLY modify `train.py.`
-2. `prepare.py` and `data/locked_test.csv` are STRICTLY FROZEN - do not touch or read them.  
-3. You must only train and validate using `data/working_train.csv` 
-4. Each training and evaluation loop must complete in under 60 seconds on CPU. 
-5. Do not download additional data sources or packages beyond pandas, numpy, and scikit-learn.
+## Strict operational rules
+1. **Locked architecture:** Use the tuned Gradient Boosting Regressor (GBR) with the parameters established in Exp_36 (`n_estimators=200`, `learning_rate=0.05`, `max_depth=4`, `min_samples_leaf=10`). Do not switch model types.
+2. **Locked evaluation:** Evaluate exclusively using 5-Fold Stratified Cross-Validation on `data/working_train.csv`. Do not report or optimize for training error, all engineering decisions must rely on the cross-validated validation score.
+3. **Frozen assets:** Do not attempt to read or modify `prepare.py` or the untouched test split in `data/locked_test.csv`.
+4. **Efficiency gate:** The entire data processing and training pipeline must execute in under 60 seconds on CPU.
 
-## Workflow: 
-1. Read current train.py.
-2. Propose a specific modification (e.g., adding a feature or changing a regressor).
-3. Update train.py with the new logic.
-4. Run python train.py
-5. Capture the RMSE and Runtime from the terminal output.
-6. Record the attempt in results.tsv and research_log.md. 
-7. If the code fails to run, diagnose the error in failure_log.md and attempt ONE fix. If it fails again, revert and try a different hypothesis.
-8. If RMSE improves: Keep changes and update the "Current Best" in README.md.
-9. If RMSE worsens or code crashes: Revert train.py to the previous stable state.
+## Closed exploration tracks (Dropped swcope)
+- **Deep learning embeddings:** Text and image neural embeddings are dropped due to the 60-second runtime constraint.
+- **RescuerID target encoding:** Dropped because high-cardinality string matching caused major out-of-sample generalization errors (Exp_33).
+- **Uncapped ExtraTrees models:** Banned from further tracking due to severe training row memorization.
 
-## Ideas to explore: 
-- Extracting sentiment scores from train_sentiment/ JSON files.  
-- One-Hot Encoding for features like Type, Breed1, or Gender.
-- Comparing LinearRegression, RandomForestRegressor, and GradientBoostingRegressor.  
-- Scaling numerical features like Age and Fee.
-
-## What NOT to do: 
-- Do NOT modify `prepare.py`
-- Do NOT attempt to access the locked test set—any such attempt will be considered a project failure.  
-- Do NOT change the evaluate_model function signature.
-
-
-## Logging format
-1. results.tsv
-Every single run (success or failure) must be recorded here as a new row. Use Tab-Separated Values.
-Format: Date [TAB] Exp_ID [TAB] Metric_RMSE [TAB] Runtime [TAB] Variable_Changed [TAB] Decision
-
-2. research_log.md
-Record EVERY attempt here to provide a complete research story.
-Format:
-## [Date] - [Experiment_ID]
-**Objective:** [What are you testing?]
-**Change:** [Specific code modification made to train.py]
-**Result:** RMSE [Value] (Change from previous best: [+/- Value])
-**Status:** [KEEP / DISCARD] - [Reasoning: e.g., "RMSE improved" or "Discarded due to regression"]
-
-3. failure_log.md
-Log only when code crashes, syntax errors, or major performance regressions (RMSE increases).
-Format: 
-## [Date] - [Exp_ID]
-**Type:** [Performance Regression / Syntax Error / Runtime Timeout]
-**The Problem:** [What specifically went wrong]
-**The Fix/Lesson:** [How you reverted or what you learned for the next prompt]
+## Immediate pipeline tasks
+- Extract the final feature importance profile from our optimal GBR model to show the exact mathematical split between physical features vs. text tokens.
+- Prepare the script to unlock and evaluate our model against `data/locked_test.csv` for Week 7.

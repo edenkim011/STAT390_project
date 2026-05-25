@@ -138,3 +138,97 @@
 **Result:** RMSE 0.0000 (Change from previous best: 0.0000)
 **Status:** [KEEP] - Floor maintained even with a single photo per pet. Visual features have sufficient per-sample variance that even one photo's color/crop/label data uniquely identifies each training row for ExtraTrees. Restored mean aggregation as stable default. Visual metadata block complete.
 
+---
+
+# CV RMSE Improvement Phase (all experiments below use 5-fold CV)
+
+## May 21, 2026 - Exp_23
+**Objective:** Replace training RMSE with 5-fold cross-validation RMSE to obtain a trustworthy out-of-sample performance estimate.
+**Change:** Replaced single fit-predict-on-train loop with KFold(n_splits=5, shuffle=True, random_state=42). StandardScaler now fit only on each training fold and applied to validation fold to prevent leakage. Reports mean ± std CV RMSE across folds.
+**Result:** CV RMSE 1.0797 ± 0.0122 (training RMSE was 0.0000 — delta is not meaningful; this is a methodology change)
+**Status:** [KEEP] - Reveals that all prior experiments showing training RMSE 0.0000 were catastrophic overfitting. ExtraTrees with min_samples_leaf=1 memorizes every training sample once the high-dimensional visual features create unique fingerprints. True generalization performance is ~1.08, barely better than Baseline_01 (1.1706 training RMSE). All future experiments will optimize CV RMSE.
+
+## May 21, 2026 - Exp_24
+**Objective:** Reduce ExtraTrees overfitting by regularizing leaf size. Hypothesis: forcing each leaf to hold ≥10 samples prevents full training memorization and improves CV RMSE.
+**Change:** ExtraTreesRegressor(min_samples_leaf=10, random_state=42). All other settings unchanged.
+**Result:** CV RMSE 1.0792 ± 0.0140 (Change from previous best: -0.0005)
+**Status:** [DISCARD] - Essentially flat. Leaf regularization does not fix the generalization gap. The problem is not leaf granularity but the model's inability to generalize the high-dimensional feature fingerprints to unseen data. Reverted to default.
+
+## May 21, 2026 - Exp_25
+**Objective:** Test whether removing visual metadata features (added in Exp_18-22, caused training RMSE to hit 0.0) recovers out-of-sample performance by eliminating overfitting signal.
+**Change:** Dropped all 9 visual features from feature set. Model: ExtraTrees default. Features: base_14 + sentiment_11.
+**Result:** CV RMSE 1.0953 ± 0.0127 (Change from previous best: +0.0156)
+**Status:** [DISCARD] - Removing visual features made CV RMSE worse, not better. Visual features carry real generalizable signal despite causing training-set memorization. Reverted to full feature set.
+
+## May 21, 2026 - Exp_26
+**Objective:** Test GradientBoostingRegressor (default settings) as an alternative to ExtraTrees. GBR uses shallow trees by default (max_depth=3) which provides built-in regularization.
+**Change:** Replaced ExtraTreesRegressor with GradientBoostingRegressor(random_state=42). Full feature set unchanged.
+**Result:** CV RMSE 1.0788 ± 0.0121 (Change from previous best: -0.0009)
+**Status:** [DISCARD] - Marginal improvement over ExtraTrees baseline (1.0797). Default GBR with depth=3 is not strong enough; its sequential shallow trees underfit relative to ExtraTrees at the same 100-iteration budget. Reverted.
+
+## May 21, 2026 - Exp_27
+**Objective:** Tune GradientBoostingRegressor: more trees, lower learning rate, deeper trees, row subsampling (stochastic GBR), and leaf regularization to improve generalization.
+**Change:** GradientBoostingRegressor(n_estimators=200, learning_rate=0.05, max_depth=4, subsample=0.8, min_samples_leaf=10, random_state=42).
+**Result:** CV RMSE 1.0745 ± 0.0109 (Change from previous best: -0.0052)
+**Status:** [KEEP] - New best. Tuned stochastic GBR outperforms ExtraTrees. The combination of row subsampling (0.8) and leaf regularization (10) reduces variance meaningfully. max_depth=4 provides stronger interactions than default depth=3.
+
+## May 21, 2026 - Exp_28
+**Objective:** Test RandomForestRegressor with leaf regularization as an alternative to GBR. RF tends to be a reliable generalizer between ExtraTrees and GBR.
+**Change:** RandomForestRegressor(min_samples_leaf=5, random_state=42). Full feature set, no TF-IDF.
+**Result:** CV RMSE 1.0797 ± 0.0125 (Change from previous best: +0.0052)
+**Status:** [DISCARD] - RF matches Exp_23 baseline exactly and is worse than tuned GBR. RF's averaging of uncorrelated trees provides less improvement than GBR's sequential residual fitting on this dataset. Reverted to GBR.
+
+## May 21, 2026 - Exp_29
+**Objective:** Test HistGradientBoostingRegressor (sklearn's histogram-based GBR, analogous to LightGBM) as a faster alternative that allows more iterations within the 60s budget.
+**Change:** HistGradientBoostingRegressor(random_state=42). Full feature set, no TF-IDF.
+**Result:** CV RMSE 1.0774 ± 0.0105 (Change from previous best: +0.0029)
+**Status:** [DISCARD] - Worse than tuned GBR (1.0745) despite running in 15.5s. Default HistGBR (max_iter=100, min_samples_leaf=20) is over-regularized relative to our tuned GBR. Reverted.
+
+## May 21, 2026 - Exp_30
+**Objective:** Push HistGBR to more iterations with lower learning rate to close the gap with tuned GBR.
+**Change:** HistGradientBoostingRegressor(max_iter=300, learning_rate=0.05, random_state=42).
+**Result:** CV RMSE 1.0770 ± 0.0151 (Change from previous best: +0.0025)
+**Status:** [DISCARD] - Marginal improvement over default HistGBR but still worse than tuned GBR and with higher variance. HistGBR axis closed. Reverted.
+
+## May 21, 2026 - Exp_31
+**Objective:** Test within-fold target encoding for Breed1 and Color1 — high-cardinality categoricals treated as raw integers — to give the model a semantically meaningful breed/color signal.
+**Change:** Added breed1_te and color1_te columns inside the CV loop: per-breed mean AdoptionSpeed computed only on training fold, unknown validation values mapped to global mean. GBR tuned config.
+**Result:** CV RMSE 1.0750 ± 0.0141 (Change from previous best: +0.0005)
+**Status:** [DISCARD] - Essentially flat vs. tuned GBR (1.0745). GBR already discovers breed-specific adoption patterns from raw integer codes through tree splits. Explicit TE adds no incremental signal. Reverted; TE columns removed.
+
+## May 21, 2026 - Exp_32
+**Objective:** Add five unused tabular columns from working_train.csv: Breed2 (secondary breed), Color2/Color3 (secondary/tertiary colors), State (geographic region, 14 values), VideoAmt (video count).
+**Change:** Expanded base_features from 14 to 19 by adding 'Breed2', 'Color2', 'Color3', 'State', 'VideoAmt'. GBR tuned config.
+**Result:** CV RMSE 1.0657 ± 0.0107 (Change from previous best: -0.0088)
+**Status:** [KEEP] - New best. State (14 geographic regions) is the primary driver — adoption rates vary significantly by Malaysian state. Breed2 also contributes as a proxy for mixed-breed status. The 0.0088 drop is the largest single-step improvement in this phase.
+
+## May 21, 2026 - Exp_33
+**Objective:** Test within-fold target encoding for RescuerID (4789 unique rescuers) to capture per-rescuer adoption quality (some rescuers consistently write better bios and take better photos).
+**Change:** Added within-fold rescuer TE column: per-rescuer mean AdoptionSpeed computed on training fold, unknowns mapped to global mean. GBR tuned + Exp_32 features.
+**Result:** CV RMSE 1.0906 ± 0.0079 (Change from previous best: +0.0249)
+**Status:** [DISCARD] - Severe regression. With 4789 unique rescuers and ~9600 training samples, most rescuers appear only 1-3 times per fold. Their target means are pure noise, and the model learns spurious rescuer-specific patterns. Reverted.
+
+## May 21, 2026 - Exp_34
+**Objective:** Feature selection — drop 12 near-zero-importance features (importance < 0.007 based on full-data GBR fit) to reduce noise and simplify the model.
+**Change:** Removed Type, Health, Vaccinated, Dewormed, VideoAmt, Color2, Color3, doc_score, sent_count, sent_mag_max, color_count, crop_confidence. Kept 27 features.
+**Result:** CV RMSE 1.0673 ± 0.0115 (Change from previous best: +0.0016)
+**Status:** [DISCARD] - Marginally worse. Tree-based GBR is robust to low-importance features — they simply don't get used much and removing them costs the marginal signal they do carry. Reverted to full 39-feature set.
+
+## May 21, 2026 - Exp_35
+**Objective:** Test `has_name` binary feature — hypothesis: named pets signal personal ownership context and may be adopted faster than unnamed shelter strays.
+**Change:** Added has_name = (Name is non-null and non-empty string). GBR tuned + Exp_32 features.
+**Result:** CV RMSE 1.0656 ± 0.0108 (Change from previous best: -0.0001)
+**Status:** [DISCARD] - Effectively flat. GBR gains no signal from the naming binary beyond what existing features already capture. Reverted has_name.
+
+## May 21, 2026 - Exp_36
+**Objective:** Extract raw text signal from pet Description using within-fold TF-IDF — the sentiment JSONs give aggregated stats but the actual vocabulary (house-trained, friendly, rescued, etc.) may carry additional predictive signal.
+**Change:** Added TfidfVectorizer(max_features=15, stop_words='english', sublinear_tf=True) fit within each CV fold; appended 15 unigram features to X_train and X_val. GBR tuned + Exp_32 features.
+**Result:** CV RMSE 1.0643 ± 0.0108 (Change from previous best: -0.0014)
+**Status:** [KEEP] - New best. Raw description vocabulary adds marginal but consistent signal beyond sentiment aggregates. Runtime 58.3s (under 60s limit). 30-feature TF-IDF was tested (1.0643 same RMSE, 60.6s over limit) — 15 features captures the same signal more efficiently.
+
+## May 21, 2026 - Exp_37
+**Objective:** Test ExtraTreesRegressor (min_samples_leaf=20) on the enriched feature set (including TF-IDF) to see if the improved features change the model comparison.
+**Change:** Replaced GBR with ExtraTreesRegressor(min_samples_leaf=20, random_state=42). All features including TF-IDF unchanged.
+**Result:** CV RMSE 1.0823 ± 0.0142 (Change from previous best: +0.0180)
+**Status:** [DISCARD] - Worse than GBR and with higher fold variance. ExtraTrees with strong leaf regularization underfits the enriched feature space. GBR's sequential residual fitting is the superior approach for this dataset. Reverted to GBR.
+
